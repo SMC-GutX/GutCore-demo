@@ -1,12 +1,14 @@
 const STATE = {
   tasks: [],
   cases: [],
+  replay: null,
   activeTaskId: null,
   activeCaseId: null,
   selectedFrameIds: new Set(),
   activeAttentionId: null,
 };
 
+const DEMO_DATA_VERSION = "20260703a";
 const MIN_RELIABLE_FRAMES = 8;
 const els = {};
 
@@ -83,16 +85,37 @@ function toggleFrame(frameId) {
 
 function replayProbability(caseData, frames) {
   if (frames.length === 0) return null;
-  if (frames.length === caseData.frames.length) return caseData.wholeCaseProbability;
+  const replayCase = STATE.replay?.cases?.[caseData.id];
+  const replayTask = STATE.replay?.tasks?.[caseData.taskId];
+  if (!replayCase || !replayTask) return caseData.wholeCaseProbability;
 
-  const evidenceMass = frames.reduce((sum, frame) => sum + frame.selectionWeight, 0);
-  const frameCoverage = frames.length / caseData.frames.length;
-  const confidence = Math.min(1, 0.16 + 0.78 * evidenceMass + 0.16 * frameCoverage);
-  return 0.5 + (caseData.wholeCaseProbability - 0.5) * confidence;
-}
+  const selected = frames.map((frame) => replayCase.frames[frame.id]).filter(Boolean);
+  if (selected.length === 0) return null;
 
-function evidenceMass(frames) {
-  return frames.reduce((sum, frame) => sum + frame.selectionWeight, 0);
+  const maxScore = Math.max(...selected.map((frame) => frame.score));
+  const scoreExp = selected.map((frame) => Math.exp(frame.score - maxScore));
+  const scoreDenom = scoreExp.reduce((sum, value) => sum + value, 0);
+  const featureDim = STATE.replay.featureDim;
+  const pooled = new Float64Array(featureDim);
+
+  selected.forEach((frame, frameIndex) => {
+    const weight = scoreExp[frameIndex] / scoreDenom;
+    for (let index = 0; index < featureDim; index += 1) {
+      pooled[index] += weight * frame.feature[index];
+    }
+  });
+
+  const logits = replayTask.classifierWeight.map((classWeights, classIndex) => {
+    let value = replayTask.classifierBias[classIndex];
+    for (let index = 0; index < featureDim; index += 1) {
+      value += classWeights[index] * pooled[index];
+    }
+    return value;
+  });
+  const maxLogit = Math.max(...logits);
+  const exp0 = Math.exp(logits[0] - maxLogit);
+  const exp1 = Math.exp(logits[1] - maxLogit);
+  return exp1 / (exp0 + exp1);
 }
 
 function roleLabel(role) {
@@ -198,17 +221,14 @@ function renderModelBox(caseData) {
 function renderOutput(caseData) {
   const frames = activeFrames(caseData);
   const probability = replayProbability(caseData, frames);
-  const mass = evidenceMass(frames);
   const ready = probability !== null;
   const task = activeTask();
-  const belowReliableCount = frames.length < MIN_RELIABLE_FRAMES;
+  const selectedScore = frames.reduce((sum, frame) => sum + Number(frame.selectionWeight || 0), 0);
+  const limitedEvidence = frames.length === 0 || frames.length < MIN_RELIABLE_FRAMES || selectedScore < 0.35;
 
   els.outputTitle.textContent = caseData.question;
   els.caseDescription.textContent = `${caseData.nImages} frames`;
-  els.outputModel.textContent = "Fine-tuned GutCore";
   els.outputSelected.textContent = `${frames.length} / ${caseData.nImages} frames`;
-  els.outputEvidence.textContent = ready ? formatPercent(mass, 1) : "0.0%";
-  els.outputWholeCase.textContent = formatPercent(caseData.wholeCaseProbability, 1);
   els.outputProbabilityLabel.textContent = ready ? caseData.probabilityLabel : "Awaiting frames";
   els.outputProbability.textContent = ready ? formatPercent(probability) : "--";
   els.outputBar.style.width = ready ? formatPercent(probability) : "0%";
@@ -218,17 +238,17 @@ function renderOutput(caseData) {
   els.outputTask.textContent = task ? task.title : "";
   els.outputPrediction.classList.toggle("is-muted", !ready);
   els.referenceText.textContent = caseData.referenceText;
-  els.selectionWarning.hidden = !belowReliableCount;
+  els.selectionWarning.hidden = !limitedEvidence;
   els.selectionWarning.textContent = frames.length === 0
-    ? `Use ${MIN_RELIABLE_FRAMES}+ images for reliable prediction.`
-    : `Use ${MIN_RELIABLE_FRAMES}+ images for reliable prediction; ${frames.length} selected.`;
+    ? "Select several representative frames before reading the probability."
+    : `Few selected frames or low total image score (${formatPercent(selectedScore, 1)}) can give inaccurate results.`;
 }
 
 function renderAttention(caseData) {
   const panel = activeAttentionPanel(caseData);
   if (!panel) return;
 
-  els.attentionNote.textContent = "Top-5 images with spatial heatmaps.";
+  els.attentionNote.textContent = "Fine-tuned Top-5 images with spatial heatmaps.";
   els.attentionList.innerHTML = "";
   caseData.attentionPanels.forEach((item) => {
     const frame = frameById(caseData, item.frameId);
@@ -253,7 +273,6 @@ function renderAttention(caseData) {
   const activeFrame = frameById(caseData, panel.frameId);
   els.attentionFrame.textContent = `Frame ${activeFrame ? displayFrameNumber(activeFrame) : panel.frameNumber}`;
   els.attentionScore.textContent = formatPercent(panel.attentionWeight, 2);
-  els.attentionOpacity.textContent = formatPercent(panel.overlayAlpha || 0, 1);
   els.addAttentionFrame.onclick = () => {
     STATE.selectedFrameIds.add(panel.frameId);
     renderExplorer(caseData);
@@ -311,10 +330,7 @@ async function initExplorer() {
     clearModel: document.querySelector("[data-clear-model]"),
     outputTitle: document.querySelector("[data-output-title]"),
     caseDescription: document.querySelector("[data-case-description]"),
-    outputModel: document.querySelector("[data-output-model]"),
     outputSelected: document.querySelector("[data-output-selected]"),
-    outputEvidence: document.querySelector("[data-output-evidence]"),
-    outputWholeCase: document.querySelector("[data-output-whole-case]"),
     outputProbabilityLabel: document.querySelector("[data-output-probability-label]"),
     outputProbability: document.querySelector("[data-output-probability]"),
     outputBar: document.querySelector("[data-output-bar]"),
@@ -328,12 +344,16 @@ async function initExplorer() {
     attentionHeatmap: document.querySelector("[data-attention-heatmap]"),
     attentionFrame: document.querySelector("[data-attention-frame]"),
     attentionScore: document.querySelector("[data-attention-score]"),
-    attentionOpacity: document.querySelector("[data-attention-opacity]"),
     addAttentionFrame: document.querySelector("[data-add-attention-frame]"),
   });
 
-  const response = await fetch("data/case_explorer.json");
+  const requestOptions = { cache: "no-store" };
+  const [response, replayResponse] = await Promise.all([
+    fetch(`data/case_explorer.json?v=${DEMO_DATA_VERSION}`, requestOptions),
+    fetch(`data/abmil_replay.json?v=${DEMO_DATA_VERSION}`, requestOptions),
+  ]);
   const payload = await response.json();
+  STATE.replay = await replayResponse.json();
   STATE.tasks = payload.tasks;
   STATE.cases = payload.cases;
   STATE.activeTaskId = STATE.tasks[0].id;
