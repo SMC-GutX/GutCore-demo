@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="GutCore is an endoscopy foundation model for whole-case gastric cancer analysis.">
+    <meta name="keywords" content="GutCore, endoscopy, foundation model, gastric cancer, biomarker prediction, survival analysis">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:title" content="GutCore: An Endoscopy Foundation Model for Whole-Case Gastric Cancer Analysis">
+    <meta property="og:description" content="A self-supervised endoscopy foundation model evaluated across whole-case gastric cancer diagnosis, biomarkers, prognosis, and public image-level benchmarks.">
+    <meta property="og:image" content="assets/gutcore-overview.png">
+
+    <title>GutCore: Endoscopy Foundation Model</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="styles/site.css">
+  </head>
+
+  <body>
+    <section class="hero is-small">
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <p class="publication-status">Preprint under medRxiv screening</p>
+              <h1 class="title publication-title">
+                GutCore: An Endoscopy Foundation Model for Whole-Case Gastric Cancer Analysis
+              </h1>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block">Sehun Kim,</span>
+                <span class="author-block">Hyosoon Yoo,</span>
+                <span class="author-block">Seong-Keun Yoo,</span>
+                <span class="author-block">Jeeyun Lee,</span>
+                <span class="author-block">Yang Won Min,</span>
+                <span class="author-block">Hyuk Lee</span>
+              </div>
+
+              <div class="is-size-5 publication-authors institution-line">
+                <span class="author-block">Samsung Medical Center</span>
+              </div>
+
+              <div class="publication-links">
+                <span class="link-block">
+                  <a class="external-link button is-normal is-rounded is-dark is-disabled" aria-disabled="true">
+                    <span class="icon"><i class="fas fa-file-lines"></i></span>
+                    <span>medRxiv pending</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="#explorer" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-images"></i></span>
+                    <span>Explorer</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="#paper" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-book-open"></i></span>
+                    <span>Summary</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="#release" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>GitHub</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section explorer-section" id="explorer">
+      <div class="container is-max-widescreen">
+        <div class="explorer-heading">
+          <p class="section-kicker">Fixed-case replay</p>
+          <h2 class="title is-3">Select frames, replay the output</h2>
+          <p>
+            Click or drag de-identified frames to replay case-level probabilities and attention maps.
+          </p>
+        </div>
+
+        <div class="task-tabs" data-task-tabs aria-label="Explorer tasks"></div>
+
+        <div class="explorer-shell whole-case-shell">
+          <aside class="case-tabs" data-case-tabs aria-label="Case examples"></aside>
+
+          <main class="case-workspace" aria-live="polite">
+            <div class="workspace-toolbar">
+              <div>
+                <p class="tool-label">Image bank</p>
+                <p class="workspace-caption" data-case-description></p>
+              </div>
+              <div class="model-actions">
+                <button type="button" data-select-anchors>Top 5</button>
+                <button type="button" data-select-all>All</button>
+                <button type="button" data-clear-model>Clear</button>
+              </div>
+            </div>
+
+            <div class="exam-frame-bank" data-frame-bank></div>
+          </main>
+
+          <aside class="model-output">
+            <p class="section-kicker">Model box</p>
+            <h3 data-output-title></h3>
+            <div class="model-dropzone" data-model-dropzone>
+              <p data-dropzone-prompt>Drop frames here.</p>
+              <div class="model-frame-strip" data-model-frames></div>
+            </div>
+            <p class="selection-warning" data-selection-warning></p>
+            <div class="probability-readout">
+              <div class="probability-label">
+                <span data-output-probability-label></span>
+                <strong data-output-probability></strong>
+              </div>
+              <div class="probability-track">
+                <span data-output-bar></span>
+              </div>
+              <strong class="dynamic-prediction" data-output-prediction></strong>
+            </div>
+            <dl class="output-details">
+              <div>
+                <dt>Task</dt>
+                <dd data-output-task></dd>
+              </div>
+              <div>
+                <dt>Replay</dt>
+                <dd data-output-model></dd>
+              </div>
+              <div>
+                <dt>Selected</dt>
+                <dd data-output-selected></dd>
+              </div>
+              <div>
+                <dt>Evidence</dt>
+                <dd data-output-evidence></dd>
+              </div>
+              <div>
+                <dt>Whole case</dt>
+                <dd data-output-whole-case></dd>
+              </div>
+            </dl>
+            <div class="reference-box">
+              <span>Reference label</span>
+              <strong data-reference-text></strong>
+            </div>
+          </aside>
+        </div>
+
+        <div class="attention-analysis" aria-live="polite">
+          <div class="attention-copy">
+            <p class="section-kicker">Attention analysis</p>
+            <h3>Attention</h3>
+            <p data-attention-note></p>
+          </div>
+          <div class="attention-layout">
+            <div class="attention-list" data-attention-list></div>
+            <div class="attention-viewer">
+              <div class="attention-image-pair">
+                <figure>
+                  <img data-attention-image alt="Selected endoscopy frame">
+                  <figcaption>Original frame</figcaption>
+                </figure>
+                <figure>
+                  <img data-attention-heatmap alt="Spatial attention heatmap">
+                  <figcaption>Spatial attention heatmap</figcaption>
+                </figure>
+              </div>
+              <div class="attention-metrics">
+                <div>
+                  <span>Frame</span>
+                  <strong data-attention-frame></strong>
+                </div>
+                <div>
+                  <span>Image score</span>
+                  <strong data-attention-score></strong>
+                </div>
+                <div>
+                  <span>Heatmap opacity</span>
+                  <strong data-attention-opacity></strong>
+                </div>
+                <button type="button" data-add-attention-frame>Add frame</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="paper">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Study in Brief</h2>
+            <div class="content has-text-justified">
+              <p>
+                GutCore was pretrained on 5.6 million de-identified endoscopic images. The study
+                tested whether all images from one endoscopic examination could be aggregated for
+                cancer detection, invasion-depth assessment, biomarker-associated phenotypes, and
+                survival stratification.
+              </p>
+              <p>
+                Public image-level datasets were used as supporting benchmarks. GutCore remains a
+                retrospective research model and is not intended for clinical decision-making without
+                further validation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section is-light" id="clinical">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column">
+            <h2 class="title is-3 has-text-centered">Whole-case clinical evaluation</h2>
+            <div class="columns is-multiline clinical-grid">
+              <div class="column is-half">
+                <div class="clinical-item">
+                  <p class="item-kicker">Diagnosis</p>
+                  <h3>Cancer detection</h3>
+                  <p>Non-cancer vs pathology-confirmed gastric cancer.</p>
+                  <strong>AUC 0.995</strong>
+                </div>
+              </div>
+              <div class="column is-half">
+                <div class="clinical-item">
+                  <p class="item-kicker">Depth</p>
+                  <h3>Muscularis propria invasion</h3>
+                  <p>Early vs advanced gastric cancer.</p>
+                  <strong>AUC 0.960</strong>
+                </div>
+              </div>
+              <div class="column is-half">
+                <div class="clinical-item">
+                  <p class="item-kicker">Biomarkers</p>
+                  <h3>EBV and MLH1-associated phenotypes</h3>
+                  <p>Tissue-defined biomarker status from whole-case images.</p>
+                  <strong>AUC 0.831 / 0.854</strong>
+                </div>
+              </div>
+              <div class="column is-half">
+                <div class="clinical-item">
+                  <p class="item-kicker">Prognosis</p>
+                  <h3>Advanced gastric cancer survival</h3>
+                  <p>Risk scores for overall survival in AGC.</p>
+                  <strong>C-index 0.681</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section is-light" id="release">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3 has-text-centered">Release status</h2>
+            <div class="content">
+              <table class="table is-fullwidth release-table">
+                <tbody>
+                  <tr>
+                    <th>Preprint</th>
+                    <td>Under medRxiv screening.</td>
+                  </tr>
+                  <tr>
+                    <th>Code and model</th>
+                    <td>Prepared for release after screening.</td>
+                  </tr>
+                  <tr>
+                    <th>Public datasets</th>
+                    <td>Available from original sources.</td>
+                  </tr>
+                  <tr>
+                    <th>Internal data</th>
+                    <td>Private patient-level data.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="data">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3 has-text-centered">Data and Ethics</h2>
+            <div class="content has-text-justified">
+              <p>
+                Public datasets are available from their original sources. Internal Samsung Medical
+                Center data are private. Retrospective use was approved by the Institutional Review
+                Board of Samsung Medical Center with consent waived.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="bibtex">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3 has-text-centered">Citation</h2>
+            <pre><code>@article{kim2026gutcore,
+  title   = {GutCore: An Endoscopy Foundation Model for Whole-Case Gastric Cancer Analysis},
+  author  = {Kim, Sehun and Yoo, Hyosoon and Yoo, Seong-Keun and Lee, Jeeyun and Min, Yang Won and Lee, Hyuk},
+  journal = {medRxiv preprint},
+  year    = {2026},
+  note    = {Under screening}
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="columns is-centered">
+          <div class="column is-8">
+            <div class="content has-text-centered">
+              <p>
+                This website is adapted from the
+                <a href="https://nerfies.github.io/" rel="noopener">Nerfies</a>
+                project page template.
+              </p>
+              <p>
+                Research model. Not for clinical decision-making.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="scripts/explorer.js"></script>
+  </body>
+</html>
