@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-    <link rel="stylesheet" href="styles/site.css?v=20260703c">
+    <link rel="stylesheet" href="styles/site.css?v=20260703e">
   </head>
 
   <body>
@@ -54,6 +54,12 @@
                   <a href="#explorer" class="external-link button is-normal is-rounded is-dark">
                     <span class="icon"><i class="fas fa-images"></i></span>
                     <span>Explorer</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="#video-attention" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-play"></i></span>
+                    <span>Videos</span>
                   </a>
                 </span>
                 <span class="link-block">
@@ -96,6 +102,29 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="section video-section" id="video-attention">
+      <div class="container is-max-widescreen">
+        <div class="video-heading">
+          <p class="section-kicker">Video attention replay</p>
+          <h2 class="title is-3">Spatial attention heatmaps</h2>
+          <p>Heatmaps are generated from cancer-detection model attention scores over the same endoscopy clip.</p>
+        </div>
+
+        <article class="video-panel video-panel-wide">
+          <video
+            autoplay
+            muted
+            loop
+            playsinline
+            controls
+            preload="metadata"
+            src="assets/video_attention/patient104_original_attention_side_by_side.mp4"
+            aria-label="Original endoscopy clip and cancer-detection spatial attention heatmap">
+          </video>
+        </article>
       </div>
     </section>
 
