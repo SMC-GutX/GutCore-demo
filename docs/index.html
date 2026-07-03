@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-    <link rel="stylesheet" href="styles/site.css?v=20260703a">
+    <link rel="stylesheet" href="styles/site.css?v=20260703c">
   </head>
 
   <body>
@@ -26,7 +26,8 @@
             <div class="column has-text-centered">
               <p class="publication-status">medRxiv preprint available</p>
               <h1 class="title publication-title">
-                GutCore: An Endoscopy Foundation Model for Whole-Case Gastric Cancer Analysis
+                <span>GutCore: An Endoscopy Foundation Model</span>
+                <span>for Whole-Case Gastric Cancer Analysis</span>
               </h1>
 
               <div class="is-size-5 publication-authors">
@@ -74,10 +75,33 @@
       </div>
     </section>
 
+    <section class="section" id="paper">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Study in brief</h2>
+            <div class="content has-text-justified">
+              <p>
+                GutCore was pretrained on 5.6 million de-identified endoscopic images. The study
+                tested whether all images from one endoscopic examination could be aggregated for
+                <strong>cancer detection</strong>, <strong>invasion-depth assessment</strong>,
+                <strong>biomarker-associated phenotypes</strong>, and
+                <strong>survival stratification</strong>.
+              </p>
+              <p>
+                <strong>Public image-level benchmarks</strong> were used as supporting evaluations.
+                GutCore remains a retrospective research model and is not intended for clinical
+                decision-making without further validation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="section explorer-section" id="explorer">
       <div class="container is-max-widescreen">
         <div class="explorer-heading">
-          <p class="section-kicker">Fixed-case replay</p>
           <h2 class="title is-3">Select frames, replay the output</h2>
           <p>
             Click or drag de-identified frames to replay case-level probabilities and attention maps.
@@ -170,29 +194,6 @@
                 </div>
                 <button type="button" data-add-attention-frame>Add frame</button>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="paper">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-four-fifths">
-            <h2 class="title is-3">Study in Brief</h2>
-            <div class="content has-text-justified">
-              <p>
-                GutCore was pretrained on 5.6 million de-identified endoscopic images. The study
-                tested whether all images from one endoscopic examination could be aggregated for
-                cancer detection, invasion-depth assessment, biomarker-associated phenotypes, and
-                survival stratification.
-              </p>
-              <p>
-                Public image-level datasets were used as supporting benchmarks. GutCore remains a
-                retrospective research model and is not intended for clinical decision-making without
-                further validation.
-              </p>
             </div>
           </div>
         </div>

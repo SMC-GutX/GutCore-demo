@@ -27,10 +27,21 @@ a {
 }
 
 .publication-title {
-  font-size: clamp(2rem, 4vw, 3.55rem);
+  font-size: clamp(2rem, 3vw, 2.75rem);
   letter-spacing: 0;
-  line-height: 1.04;
+  line-height: 1.08;
   margin-bottom: 1rem;
+}
+
+.publication-title span {
+  display: block;
+  white-space: nowrap;
+}
+
+@media screen and (min-width: 769px) and (max-width: 1023px) {
+  .publication-title {
+    font-size: 2.25rem;
+  }
 }
 
 .publication-subtitle {
@@ -1064,6 +1075,15 @@ pre {
 
   .publication-title {
     font-size: 2.15rem;
+  }
+
+  .publication-title span {
+    display: inline;
+    white-space: normal;
+  }
+
+  .publication-title span + span::before {
+    content: " ";
   }
 
   .publication-subtitle {

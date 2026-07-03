@@ -8,7 +8,7 @@ const STATE = {
   activeAttentionId: null,
 };
 
-const DEMO_DATA_VERSION = "20260703a";
+const DEMO_DATA_VERSION = "20260703c";
 const MIN_RELIABLE_FRAMES = 8;
 const els = {};
 
